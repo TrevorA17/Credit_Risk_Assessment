@@ -81,3 +81,29 @@ cross_val_model <- train(loan_status ~ ., data = credit_data_clean, method = "gl
 # Print the model
 print(cross_val_model)
 
+# Load necessary libraries
+library(caret)
+
+# Set seed for reproducibility
+set.seed(123)
+
+# Define the training control
+train_control <- trainControl(method = "cv", number = 10)  # 10-fold cross-validation
+
+# Train logistic regression model
+logistic_model <- train(loan_status ~ ., data = credit_data_clean, method = "glm", trControl = train_control)
+
+# Train decision tree model
+decision_tree_model <- train(loan_status ~ ., data = credit_data_clean, method = "rpart", trControl = train_control)
+
+# Train gradient boosting model
+gradient_boosting_model <- train(loan_status ~ ., data = credit_data_clean, method = "gbm", trControl = train_control)
+
+# Print the models
+print("Logistic Regression Model:")
+print(logistic_model)
+print("Decision Tree Model:")
+print(decision_tree_model)
+print("Gradient Boosting Model:")
+print(gradient_boosting_model)
+
