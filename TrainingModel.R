@@ -107,3 +107,31 @@ print(decision_tree_model)
 print("Gradient Boosting Model:")
 print(gradient_boosting_model)
 
+# Load necessary libraries
+library(caret)
+
+# Set seed for reproducibility
+set.seed(123)
+
+# Remove rows with missing values
+credit_data_clean <- na.omit(credit_data)
+
+# Define the training control
+train_control <- trainControl(method = "cv", number = 10)  # 10-fold cross-validation
+
+# Define models
+models <- list(
+  "Logistic Regression" = train(loan_status ~ ., data = credit_data_clean, method = "glm", trControl = train_control),
+  "Decision Tree" = train(loan_status ~ ., data = credit_data_clean, method = "rpart", trControl = train_control),
+  "Gradient Boosting" = train(loan_status ~ ., data = credit_data_clean, method = "gbm", trControl = train_control)
+)
+
+# Train models
+model_results <- resamples(models)
+
+# Summarize results
+summary_results <- summary(model_results)
+
+# Print summary of performance metrics
+print(summary_results)
+
