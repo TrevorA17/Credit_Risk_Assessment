@@ -63,3 +63,13 @@ correlation_matrix <- cor(credit_data[, sapply(credit_data, is.numeric)])
 print("Correlation Matrix:")
 print(correlation_matrix)
 
+# Perform ANOVA tests for numeric variables against a categorical variable
+anova_results <- lapply(credit_data[, sapply(credit_data, is.numeric)], function(x) {
+  aov_result <- aov(x ~ loan_status, data = credit_data)
+  return(summary(aov_result))
+})
+
+# Display ANOVA results
+print("ANOVA Results:")
+print(anova_results)
+
