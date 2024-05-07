@@ -21,3 +21,20 @@ head(credit_data)
 
 # View the dataset in a separate viewer window
 View(credit_data)
+
+# Load necessary libraries
+library(caret)
+
+# Set seed for reproducibility
+set.seed(123)
+
+# Split the dataset into training and testing sets (70% training, 30% testing)
+train_index <- createDataPartition(credit_data$loan_status, p = 0.7, list = FALSE)
+train_data <- credit_data[train_index, ]
+test_data <- credit_data[-train_index, ]
+
+# Display the dimensions of the training and testing sets
+print("Dimensions of Training Set:")
+print(dim(train_data))
+print("Dimensions of Testing Set:")
+print(dim(test_data))
