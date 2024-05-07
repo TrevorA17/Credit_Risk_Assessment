@@ -48,3 +48,10 @@ central_tendency <- sapply(credit_data[, sapply(credit_data, is.numeric)], funct
 # Display measures of central tendency
 print("Measures of Central Tendency:")
 print(central_tendency)
+
+# Calculate measures of distribution for numeric variables
+distribution_measures <- sapply(credit_data[, sapply(credit_data, is.numeric)], function(x) c(range = diff(range(x)), variance = var(x), standard_deviation = sd(x)))
+
+# Display measures of distribution
+print("Measures of Distribution:")
+print(distribution_measures)
