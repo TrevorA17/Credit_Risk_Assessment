@@ -38,3 +38,46 @@ print("Dimensions of Training Set:")
 print(dim(train_data))
 print("Dimensions of Testing Set:")
 print(dim(test_data))
+
+# Load necessary libraries
+library(boot)
+
+# Define a function to calculate the statistic of interest (e.g., mean)
+statistic_function <- function(data, index) {
+  # Subset data using bootstrap indices
+  bootstrap_sample <- data[index, ]
+  
+  # Calculate the statistic of interest (e.g., mean)
+  statistic_value <- mean(bootstrap_sample$loan_amnt)
+  
+  return(statistic_value)
+}
+
+# Set seed for reproducibility
+set.seed(123)
+
+# Perform bootstrapping with 1000 bootstrap replicates
+bootstrap_results <- boot(data = credit_data, statistic = statistic_function, R = 1000)
+
+# Display bootstrapping results
+print("Bootstrapping Results:")
+print(bootstrap_results)
+
+# Load necessary libraries
+library(caret)
+
+# Set seed for reproducibility
+set.seed(123)
+
+# Remove rows with missing values
+credit_data_clean <- na.omit(credit_data)
+
+# Define the training control
+train_control <- trainControl(method = "cv", number = 10)  # 10-fold cross-validation
+
+# Train the model using k-fold cross-validation
+cross_val_model <- train(loan_status ~ ., data = credit_data_clean, method = "glm", trControl = train_control)
+
+# Print the model
+print(cross_val_model)
+
