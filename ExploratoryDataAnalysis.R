@@ -108,11 +108,15 @@ library(ggplot2)
 
 # Scatter plot matrix for numeric variables
 numeric_variables <- credit_data[, sapply(credit_data, is.numeric)]
-scatter_plot_matrix <- ggplot(credit_data, aes(x = ..density.., y = ..density..)) +
+# Scatter plot matrix for numeric variables
+scatter_plot_matrix <- ggplot(credit_data, aes(x = .data[[colnames(numeric_variables)[1]]], y = .data[[colnames(numeric_variables)[2]]])) +
   geom_point(alpha = 0.5) +
-  geom_smooth(method = "lm", se = FALSE) +
-  facet_grid(. ~ ., scales = "free") +
+  facet_wrap(~., scales = "free") +
   theme_minimal()
+
+# Display scatter plot matrix
+print("Scatter Plot Matrix:")
+print(scatter_plot_matrix)
 
 # Box plot for numeric variables against loan_status
 box_plot_numeric <- lapply(colnames(numeric_variables), function(variable) {
