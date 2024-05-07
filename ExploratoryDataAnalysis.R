@@ -55,3 +55,11 @@ distribution_measures <- sapply(credit_data[, sapply(credit_data, is.numeric)], 
 # Display measures of distribution
 print("Measures of Distribution:")
 print(distribution_measures)
+
+# Calculate correlation coefficients for numeric variables
+correlation_matrix <- cor(credit_data[, sapply(credit_data, is.numeric)])
+
+# Display correlation matrix
+print("Correlation Matrix:")
+print(correlation_matrix)
+
