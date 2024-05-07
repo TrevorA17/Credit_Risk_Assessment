@@ -21,3 +21,17 @@ head(credit_data)
 
 # View the dataset in a separate viewer window
 View(credit_data)
+
+# Calculate frequency counts for categorical variables
+frequency_counts <- lapply(credit_data[, sapply(credit_data, is.factor)], table)
+
+# Calculate percentages for categorical variables
+percentage_counts <- lapply(frequency_counts, prop.table)
+
+# Display frequency counts
+print("Frequency Counts:")
+print(frequency_counts)
+
+# Display percentage counts
+print("Percentage Counts:")
+print(percentage_counts)
