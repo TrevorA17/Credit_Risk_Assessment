@@ -73,3 +73,32 @@ anova_results <- lapply(credit_data[, sapply(credit_data, is.numeric)], function
 print("ANOVA Results:")
 print(anova_results)
 
+library(ggplot2)
+
+# Univariate plots for numeric variables
+numeric_variables <- credit_data[, sapply(credit_data, is.numeric)]
+numeric_plots <- lapply(colnames(numeric_variables), function(variable) {
+  ggplot(credit_data, aes(x = !!as.name(variable))) +
+    geom_histogram(fill = "skyblue", color = "black") +
+    labs(title = paste("Histogram of", variable), x = variable, y = "Frequency") +
+    theme_minimal()
+})
+
+# Univariate plots for categorical variables
+categorical_variables <- credit_data[, sapply(credit_data, is.factor)]
+categorical_plots <- lapply(colnames(categorical_variables), function(variable) {
+  ggplot(credit_data, aes(x = !!as.name(variable))) +
+    geom_bar(fill = "skyblue", color = "black") +
+    labs(title = paste("Bar Plot of", variable), x = variable, y = "Count") +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+})
+
+# Display numeric plots
+print("Numeric Variable Plots:")
+print(numeric_plots)
+
+# Display categorical plots
+print("Categorical Variable Plots:")
+print(categorical_plots)
+
