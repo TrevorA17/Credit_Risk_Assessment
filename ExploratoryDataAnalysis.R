@@ -102,3 +102,44 @@ print(numeric_plots)
 print("Categorical Variable Plots:")
 print(categorical_plots)
 
+
+# Load necessary libraries
+library(ggplot2)
+
+# Scatter plot matrix for numeric variables
+numeric_variables <- credit_data[, sapply(credit_data, is.numeric)]
+scatter_plot_matrix <- ggplot(credit_data, aes(x = ..density.., y = ..density..)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE) +
+  facet_grid(. ~ ., scales = "free") +
+  theme_minimal()
+
+# Box plot for numeric variables against loan_status
+box_plot_numeric <- lapply(colnames(numeric_variables), function(variable) {
+  ggplot(credit_data, aes_string(x = "loan_status", y = variable)) +
+    geom_boxplot(fill = "skyblue", color = "black") +
+    labs(title = paste("Box Plot of", variable, "by Loan Status"), x = "Loan Status", y = variable) +
+    theme_minimal()
+})
+
+# Grouped bar plot for categorical variables against loan_status
+categorical_variables <- credit_data[, sapply(credit_data, is.factor)]
+bar_plot_categorical <- lapply(colnames(categorical_variables), function(variable) {
+  ggplot(credit_data, aes_string(x = "loan_status", fill = variable)) +
+    geom_bar(position = "dodge") +
+    labs(title = paste("Grouped Bar Plot of", variable, "by Loan Status"), x = "Loan Status", y = "Count") +
+    theme_minimal()
+})
+
+# Display scatter plot matrix
+print("Scatter Plot Matrix:")
+print(scatter_plot_matrix)
+
+# Display box plots for numeric variables
+print("Box Plots for Numeric Variables:")
+print(box_plot_numeric)
+
+# Display grouped bar plots for categorical variables
+print("Grouped Bar Plots for Categorical Variables:")
+print(bar_plot_categorical)
+
