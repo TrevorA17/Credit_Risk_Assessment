@@ -35,3 +35,16 @@ print(frequency_counts)
 # Display percentage counts
 print("Percentage Counts:")
 print(percentage_counts)
+
+# Custom function to find mode
+Mode <- function(x) {
+  ux <- unique(x)
+  ux[which.max(tabulate(match(x, ux)))]
+}
+
+# Calculate measures of central tendency for numeric variables
+central_tendency <- sapply(credit_data[, sapply(credit_data, is.numeric)], function(x) c(mean = mean(x), median = median(x), mode = Mode(x)))
+
+# Display measures of central tendency
+print("Measures of Central Tendency:")
+print(central_tendency)
