@@ -1,7 +1,7 @@
 ---
-title: "Customer Churn Prediction"
-author: "134780 Trevor Okinda"
-date: "April 2024"
+title: "Credit Risk Assessment"
+author: "Trevor Okinda"
+date: "2024"
 output:
   github_document: 
     toc: yes
@@ -20,7 +20,7 @@ editor_options:
 | **Student ID Number**                        | 134780 |
 | **Student Name**                             | Trevor Okinda |
 | **BBIT 4.2 Group**                           | C |
-| **Project Name**                             | Customer Churn Prediction Model |
+| **Project Name**                             | Credit Risk Assessment |
 
 # Setup Chunk
 
@@ -31,4 +31,382 @@ More KnitR options are documented here <https://bookdown.org/yihui/rmarkdown-coo
 ```{r setup, include=FALSE}
 library(formatR)
 knitr::opts_chunk$set(warning = FALSE, collapse = FALSE)
+
 ```
+
+# Exploratory Data Analysis
+## Load dataset
+```{r load dataset}
+# Load dataset
+credit_data <- read.csv("credit_risk_dataset.csv", colClasses = c(
+  person_age = "integer",
+  person_income = "integer",
+  person_home_ownership = "factor",
+  person_emp_length = "numeric",
+  loan_intent = "factor",
+  loan_amnt = "integer",
+  loan_int_rate = "numeric",
+  loan_status = "factor",
+  loan_percent_income = "numeric",
+  cb_person_default_on_file = "factor",
+  cb_person_cred_hist_length = "integer"
+))
+
+# Display the structure of the dataset
+str(credit_data)
+
+# View the first few rows of the dataset
+head(credit_data)
+
+# View the dataset in a separate viewer window
+View(credit_data)
+```
+
+## Measures of frequency
+```{r measures of frequency}
+# Calculate frequency counts for categorical variables
+frequency_counts <- lapply(credit_data[, sapply(credit_data, is.factor)], table)
+
+# Calculate percentages for categorical variables
+percentage_counts <- lapply(frequency_counts, prop.table)
+
+# Display frequency counts
+print("Frequency Counts:")
+print(frequency_counts)
+
+# Display percentage counts
+print("Percentage Counts:")
+print(percentage_counts)
+```
+
+## Measures of central tendency
+```{r Measures of central tendency}
+# Custom function to find mode
+Mode <- function(x) {
+  ux <- unique(x)
+  ux[which.max(tabulate(match(x, ux)))]
+}
+
+# Calculate measures of central tendency for numeric variables
+central_tendency <- sapply(credit_data[, sapply(credit_data, is.numeric)], function(x) c(mean = mean(x), median = median(x), mode = Mode(x)))
+
+# Display measures of central tendency
+print("Measures of Central Tendency:")
+print(central_tendency)
+```
+
+## Measures of Distribution
+```{r Measures of distribution}
+# Calculate measures of distribution for numeric variables
+distribution_measures <- sapply(credit_data[, sapply(credit_data, is.numeric)], function(x) c(range = diff(range(x)), variance = var(x), standard_deviation = sd(x)))
+
+# Display measures of distribution
+print("Measures of Distribution:")
+print(distribution_measures)
+```
+
+## Measures of Relationship
+```{r Measures of relationship}
+# Calculate correlation coefficients for numeric variables
+correlation_matrix <- cor(credit_data[, sapply(credit_data, is.numeric)])
+
+# Display correlation matrix
+print("Correlation Matrix:")
+print(correlation_matrix)
+```
+
+## ANOVA
+```{r ANOVA}
+# Perform ANOVA tests for numeric variables against a categorical variable
+anova_results <- lapply(credit_data[, sapply(credit_data, is.numeric)], function(x) {
+  aov_result <- aov(x ~ loan_status, data = credit_data)
+  return(summary(aov_result))
+})
+
+# Display ANOVA results
+print("ANOVA Results:")
+print(anova_results)
+
+```
+
+## Plots
+```{r Plots}
+library(ggplot2)
+
+# Univariate plots for numeric variables
+numeric_variables <- credit_data[, sapply(credit_data, is.numeric)]
+numeric_plots <- lapply(colnames(numeric_variables), function(variable) {
+  ggplot(credit_data, aes(x = !!as.name(variable))) +
+    geom_histogram(fill = "skyblue", color = "black") +
+    labs(title = paste("Histogram of", variable), x = variable, y = "Frequency") +
+    theme_minimal()
+})
+
+# Univariate plots for categorical variables
+categorical_variables <- credit_data[, sapply(credit_data, is.factor)]
+categorical_plots <- lapply(colnames(categorical_variables), function(variable) {
+  ggplot(credit_data, aes(x = !!as.name(variable))) +
+    geom_bar(fill = "skyblue", color = "black") +
+    labs(title = paste("Bar Plot of", variable), x = variable, y = "Count") +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+})
+
+# Display numeric plots
+print("Numeric Variable Plots:")
+print(numeric_plots)
+
+# Display categorical plots
+print("Categorical Variable Plots:")
+print(categorical_plots)
+
+
+# Load necessary libraries
+library(ggplot2)
+
+# Scatter plot matrix for numeric variables
+numeric_variables <- credit_data[, sapply(credit_data, is.numeric)]
+# Scatter plot matrix for numeric variables
+scatter_plot_matrix <- ggplot(credit_data, aes(x = .data[[colnames(numeric_variables)[1]]], y = .data[[colnames(numeric_variables)[2]]])) +
+  geom_point(alpha = 0.5) +
+  facet_wrap(~., scales = "free") +
+  theme_minimal()
+
+# Display scatter plot matrix
+print("Scatter Plot Matrix:")
+print(scatter_plot_matrix)
+
+# Box plot for numeric variables against loan_status
+box_plot_numeric <- lapply(colnames(numeric_variables), function(variable) {
+  ggplot(credit_data, aes_string(x = "loan_status", y = variable)) +
+    geom_boxplot(fill = "skyblue", color = "black") +
+    labs(title = paste("Box Plot of", variable, "by Loan Status"), x = "Loan Status", y = variable) +
+    theme_minimal()
+})
+
+# Grouped bar plot for categorical variables against loan_status
+categorical_variables <- credit_data[, sapply(credit_data, is.factor)]
+bar_plot_categorical <- lapply(colnames(categorical_variables), function(variable) {
+  ggplot(credit_data, aes_string(x = "loan_status", fill = variable)) +
+    geom_bar(position = "dodge") +
+    labs(title = paste("Grouped Bar Plot of", variable, "by Loan Status"), x = "Loan Status", y = "Count") +
+    theme_minimal()
+})
+
+# Display scatter plot matrix
+print("Scatter Plot Matrix:")
+print(scatter_plot_matrix)
+
+# Display box plots for numeric variables
+print("Box Plots for Numeric Variables:")
+print(box_plot_numeric)
+
+# Display grouped bar plots for categorical variables
+print("Grouped Bar Plots for Categorical Variables:")
+print(bar_plot_categorical)
+```
+
+# Preprocessing and Data Transformation
+## Missing Values
+```{r missing values}
+# Count missing values in each column
+missing_values <- colSums(is.na(credit_data))
+
+# Display columns with missing values
+print("Columns with Missing Values:")
+print(names(missing_values[missing_values > 0]))
+
+# Display total number of missing values
+print("Total Number of Missing Values:")
+print(sum(missing_values))
+```
+
+## Imputation
+```{r imputation}
+# Mean imputation for missing values in numeric variables
+credit_data_imputed <- credit_data
+
+numeric_variables <- credit_data_imputed[, sapply(credit_data_imputed, is.numeric)]
+for (variable in colnames(numeric_variables)) {
+  if (anyNA(credit_data_imputed[[variable]])) {
+    credit_data_imputed[[variable]][is.na(credit_data_imputed[[variable]])] <- mean(credit_data_imputed[[variable]], na.rm = TRUE)
+  }
+}
+
+# Check if there are still missing values
+missing_values_after_imputation <- colSums(is.na(credit_data_imputed))
+
+# Display columns with missing values after imputation
+print("Columns with Missing Values After Imputation:")
+print(names(missing_values_after_imputation[missing_values_after_imputation > 0]))
+```
+
+## Standardization
+```{r Standardization}
+# Standardization (Z-score normalization) for numeric variables
+numeric_variables <- credit_data[, sapply(credit_data, is.numeric)]
+standardized_numeric <- scale(numeric_variables)
+
+# Create a new dataframe with standardized numeric variables
+credit_data_standardized <- as.data.frame(standardized_numeric)
+names(credit_data_standardized) <- colnames(numeric_variables)
+
+# Display summary statistics of standardized numeric variables
+summary(credit_data_standardized)
+```
+
+# Training Model
+## Data splitting
+```{r Data splitting}
+# Load necessary libraries
+library(caret)
+
+# Set seed for reproducibility
+set.seed(123)
+
+# Split the dataset into training and testing sets (70% training, 30% testing)
+train_index <- createDataPartition(credit_data$loan_status, p = 0.7, list = FALSE)
+train_data <- credit_data[train_index, ]
+test_data <- credit_data[-train_index, ]
+
+# Display the dimensions of the training and testing sets
+print("Dimensions of Training Set:")
+print(dim(train_data))
+print("Dimensions of Testing Set:")
+print(dim(test_data))
+```
+
+## Bootstrapping
+```{r Bootstrapping}
+# Load necessary libraries
+library(boot)
+
+# Define a function to calculate the statistic of interest (e.g., mean)
+statistic_function <- function(data, index) {
+  # Subset data using bootstrap indices
+  bootstrap_sample <- data[index, ]
+  
+  # Calculate the statistic of interest (e.g., mean)
+  statistic_value <- mean(bootstrap_sample$loan_amnt)
+  
+  return(statistic_value)
+}
+
+# Set seed for reproducibility
+set.seed(123)
+
+# Perform bootstrapping with 1000 bootstrap replicates
+bootstrap_results <- boot(data = credit_data, statistic = statistic_function, R = 1000)
+
+# Display bootstrapping results
+print("Bootstrapping Results:")
+print(bootstrap_results)
+```
+
+## Cross Validation
+```{r Cross validation}
+# Load necessary libraries
+library(caret)
+
+# Set seed for reproducibility
+set.seed(123)
+
+# Remove rows with missing values
+credit_data_clean <- na.omit(credit_data)
+
+# Define the training control
+train_control <- trainControl(method = "cv", number = 10)  # 10-fold cross-validation
+
+# Train the model using k-fold cross-validation
+cross_val_model <- train(loan_status ~ ., data = credit_data_clean, method = "glm", trControl = train_control)
+
+# Print the model
+print(cross_val_model)
+```
+
+## Train Different Models
+```{r train models}
+# Load necessary libraries
+library(caret)
+
+# Set seed for reproducibility
+set.seed(123)
+
+# Define the training control
+train_control <- trainControl(method = "cv", number = 10)  # 10-fold cross-validation
+
+# Train logistic regression model
+logistic_model <- train(loan_status ~ ., data = credit_data_clean, method = "glm", trControl = train_control)
+
+# Train decision tree model
+decision_tree_model <- train(loan_status ~ ., data = credit_data_clean, method = "rpart", trControl = train_control)
+
+# Train gradient boosting model
+gradient_boosting_model <- train(loan_status ~ ., data = credit_data_clean, method = "gbm", trControl = train_control)
+
+# Print the models
+print("Logistic Regression Model:")
+print(logistic_model)
+print("Decision Tree Model:")
+print(decision_tree_model)
+print("Gradient Boosting Model:")
+print(gradient_boosting_model)
+```
+
+## Performance comparison
+```{r performance comparison}
+# Load necessary libraries
+library(caret)
+
+# Set seed for reproducibility
+set.seed(123)
+
+# Remove rows with missing values
+credit_data_clean <- na.omit(credit_data)
+
+# Define the training control
+train_control <- trainControl(method = "cv", number = 10)  # 10-fold cross-validation
+
+# Define models
+models <- list(
+  "Logistic Regression" = train(loan_status ~ ., data = credit_data_clean, method = "glm", trControl = train_control),
+  "Decision Tree" = train(loan_status ~ ., data = credit_data_clean, method = "rpart", trControl = train_control),
+  "Gradient Boosting" = train(loan_status ~ ., data = credit_data_clean, method = "gbm", trControl = train_control)
+)
+
+# Train models
+model_results <- resamples(models)
+
+# Summarize results
+summary_results <- summary(model_results)
+
+# Print summary of performance metrics
+print(summary_results)
+```
+
+## Saving Model
+```{r Saving Model}
+# Load the saved model
+loaded_gbm_model <- readRDS("./models/saved_gbm_model.rds")
+
+# Prepare new data for prediction (using credit risk dataset variables)
+new_data <- data.frame(
+  person_age = 35,
+  person_income = 60000,
+  person_home_ownership = "RENT",
+  person_emp_length = 5,
+  loan_intent = "EDUCATION",
+  loan_amnt = 10000,
+  loan_int_rate = 10.5,
+  loan_percent_income = 0.2,
+  cb_person_default_on_file = "N",
+  cb_person_cred_hist_length = 4
+)
+
+# Use the loaded model to make predictions
+predictions_loaded_model <- predict(loaded_gbm_model, newdata = new_data)
+
+# Print predictions
+print(predictions_loaded_model)
+```
+
