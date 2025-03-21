@@ -30,8 +30,5 @@ More KnitR options are documented here <https://bookdown.org/yihui/rmarkdown-coo
 
 ```{r setup, include=FALSE}
 library(formatR)
-knitr::opts_chunk$set(
-  warning = FALSE,
-  collapse = FALSE
-)
+knitr::opts_chunk$set(warning = FALSE, collapse = FALSE)
 ```
